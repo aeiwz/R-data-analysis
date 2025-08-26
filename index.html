@@ -114,8 +114,24 @@
       border-radius: 14px;
       box-shadow: var(--shadow);
       overflow:auto;
+      -webkit-overflow-scrolling: touch;
     }
-    pre code{ font-size: 14px; }
+    pre code{
+      font-size: 14px;
+      white-space: pre-wrap;      /* wrap long lines on mobile */
+      word-break: break-word;     /* avoid overflow for long tokens */
+      color: var(--ink);
+    }
+
+    /* 🔧 Prism token fixes: remove unintended white backgrounds */
+    pre code span { background: transparent !important; }
+    .token.operator, .token.punctuation { color: #eaf0ff; background: transparent !important; }
+    .token.keyword { color: #ff8caa; }
+    .token.function { color: #7dd3fc; }
+    .token.number { color: #f9ca24; }
+    .token.string { color: #b0f4a8; }
+    .token.comment { color: #94a3c2; }
+
     .codebar {
       position:absolute; top:6px; right:6px; display:flex; gap:6px;
     }
@@ -141,6 +157,14 @@
     .badge{
       display:inline-block; padding:4px 8px; border-radius: 999px;
       background: #0a2033; color:#a6e3ff; border:1px solid #0f3450; font-size:12px; font-weight:600;
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 480px){
+      pre code{ font-size: 13px; }
+      h1{ font-size: 28px; }
+      h2{ font-size: 22px; }
+      .wrap{ padding: 20px 14px 56px; }
     }
   </style>
 </head>
@@ -355,7 +379,7 @@ print(conf_mat)</code></pre>
     // Copy all code blocks concatenated
     document.getElementById('btnCopyAll').addEventListener('click', async () => {
       const blocks = Array.from(document.querySelectorAll('pre code'));
-      const combined = blocks.map(b => b.innerText).join('\n\n');
+      const combined = blocks.map(b => b.innerText).join('\\n\\n');
       try{
         await navigator.clipboard.writeText(combined);
         const btn = document.getElementById('btnCopyAll');
