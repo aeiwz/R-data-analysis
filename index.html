@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>R Data Analysis Pipeline — BreastCancer (mlbench)</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <!-- Prism for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-r.min.js"></script>
+
+  <style>
+    :root{
+      --bg: #0c1222;
+      --panel: #111a33;
+      --ink: #eaf0ff;
+      --muted: #a6b5d8;
+      --accent: #7dd3fc;
+      --accent-ink: #06202a;
+      --border: #1b274a;
+      --code-bg: #0a1120;
+      --shadow: 0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      background:
+        radial-gradient(1200px 600px at -10% -10%, #0d1735 0%, transparent 50%),
+        radial-gradient(800px 400px at 110% 20%, #07202f 0%, transparent 60%),
+        var(--bg);
+      color:var(--ink);
+      line-height:1.6;
+      letter-spacing: .2px;
+    }
+
+    /* Layout */
+    .wrap{ max-width: 980px; margin: 0 auto; padding: 28px 18px 64px; }
+    header{
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: saturate(140%) blur(8px);
+      background: linear-gradient(180deg, rgba(12,18,34,.9), rgba(12,18,34,.6));
+      border-bottom: 1px solid var(--border);
+    }
+    header .bar{
+      display:flex; align-items:center; gap:14px; padding:14px 18px; max-width:980px; margin:0 auto;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.5px;
+    }
+    .brand .dot{
+      width:14px; height:14px; border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #c8f0ff, #7dd3fc 55%, #3aa4cf 100%);
+      box-shadow: 0 0 0 3px rgba(125,211,252,.15), 0 0 30px rgba(125,211,252,.35);
+    }
+    .brand span{ font-size: 15px; color: var(--muted); font-weight: 600; }
+    .actions{ margin-left:auto; display:flex; gap:10px; }
+    .btn{
+      appearance:none; border:1px solid var(--border); background: var(--panel); color: var(--ink);
+      padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer;
+      box-shadow: var(--shadow);
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn.accent{
+      background: linear-gradient(180deg, #8be8ff, #74d2ff);
+      color: var(--accent-ink);
+      border-color: #2ab6de;
+    }
+
+    h1{ font-size: 34px; line-height:1.15; margin: 22px 0 14px; letter-spacing:.3px; }
+    h2{ font-size: 26px; margin: 28px 0 14px; }
+    h3{ font-size: 20px; margin: 22px 0 10px; color: var(--muted); }
+    p, li{ color:#d8e3ff; }
+    .lead{
+      color: var(--muted);
+      font-size: 18px;
+      margin-top: 0;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin: 16px 0 22px;
+    }
+
+    .toc{
+      display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;
+      margin: 8px 0 6px;
+    }
+    .toc a{
+      display:block; text-decoration:none; color: var(--ink);
+      background: var(--panel);
+      border:1px solid var(--border);
+      border-radius: 12px; padding: 12px 14px; font-weight:600;
+      box-shadow: var(--shadow);
+    }
+    .toc a:hover{ outline: 2px solid #3aa4cf33; transform: translateY(-1px); }
+
+    /* Code blocks */
+    pre{
+      position: relative; margin: 14px 0 18px;
+      background: var(--code-bg);
+      border:1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      overflow:auto;
+    }
+    pre code{ font-size: 14px; }
+    .codebar {
+      position:absolute; top:6px; right:6px; display:flex; gap:6px;
+    }
+    .copy-btn{
+      border:none; border-radius: 8px; padding: 6px 10px; cursor: pointer;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color: var(--ink); font-weight:600; font-size:12px;
+      border:1px solid var(--border);
+    }
+    .copy-btn:hover{ background: rgba(255,255,255,.08); }
+    .copy-btn.ok{ background: #2ecc71; border-color: #1fa95a; color: #08140e; }
+
+    /* Footer */
+    footer{
+      margin-top: 40px; padding: 24px 0; border-top: 1px solid var(--border);
+      color: var(--muted); font-size: 14px; text-align:center;
+    }
+
+    /* Links */
+    a{ color:#8fe4ff; }
+    a:hover{ color:#aaf0ff; }
+
+    .badge{
+      display:inline-block; padding:4px 8px; border-radius: 999px;
+      background: #0a2033; color:#a6e3ff; border:1px solid #0f3450; font-size:12px; font-weight:600;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="brand"><div class="dot"></div><strong>R Pipeline</strong> <span>BreastCancer (mlbench)</span></div>
+      <div class="actions">
+        <button class="btn" id="btnExpand">Expand All Code</button>
+        <button class="btn accent" id="btnCopyAll">Copy All Code</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>🔬 R Data Analysis Pipeline Example</h1>
+    <p class="lead"><span class="badge">Dataset</span> BreastCancer from <code>mlbench</code>. This pipeline walks through loading &amp; cleaning data, EDA, statistical testing, PCA &amp; clustering, and a Random Forest classifier.</p>
+
+    <div class="card">
+      <h3>Table of Contents</h3>
+      <div class="toc">
+        <a href="#step1">📦 Step 1 — Load Libraries</a>
+        <a href="#step2">📂 Step 2 — Load Data</a>
+        <a href="#step3">🔎 Step 3 — Initial Exploration</a>
+        <a href="#step4">🧹 Step 4 — Data Cleaning</a>
+        <a href="#step5">🧩 Step 5 — Handle Missing Data</a>
+        <a href="#step6">⚖️ Step 6 — Normalization</a>
+        <a href="#step7">📊 Step 7 — EDA</a>
+        <a href="#step8">📑 Step 8 — Statistical Testing</a>
+        <a href="#step9">🔀 Step 9 — PCA &amp; Clustering</a>
+        <a href="#step10">🤖 Step 10 — Classification</a>
+      </div>
+    </div>
+
+    <section id="intro" class="card">
+      <p>This page is a clean, reusable handout you can give to students. Each step includes runnable R code blocks. Click the <strong>Copy</strong> button on any code box to copy it to your clipboard.</p>
+    </section>
+
+    <section id="step1" class="card">
+      <h2>📦 Step 1 — Load Required Libraries</h2>
+      <p>We load packages for data wrangling, visualization, multivariate analysis, clustering, and machine learning.</p>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">library(mlbench)       # BreastCancer dataset
+library(dplyr)         # Data manipulation
+library(tidyr)         # Handling missing values
+library(ggplot2)       # Data visualization
+library(FactoMineR)    # Multivariate analysis (PCA)
+library(factoextra)    # Visualizing PCA/Clustering
+library(caret)         # Data partition &amp; ML training
+library(cluster)       # Clustering algorithms
+library(purrr)         # Functional programming helpers
+library(randomForest)  # Classification model</code></pre>
+    </section>
+
+    <section id="step2" class="card">
+      <h2>📂 Step 2 — Load Data</h2>
+      <p>The dataset <code>BreastCancer</code> contains cytological features and the target variable <code>Class</code> (benign/malignant).</p>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">data("BreastCancer")
+df &lt;- BreastCancer</code></pre>
+    </section>
+
+    <section id="step3" class="card">
+      <h2>🔎 Step 3 — Initial Exploration</h2>
+      <p>Quickly understand structure, summary statistics, and a snapshot of the data.</p>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">glimpse(df)
+summary(df)
+head(df)</code></pre>
+    </section>
+
+    <section id="step4" class="card">
+      <h2>🧹 Step 4 — Data Cleaning</h2>
+      <p>Drop the non-informative ID column and convert predictors to numeric as needed.</p>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r"># Remove ID column and ensure Class is valid
+df_clean &lt;- df %&gt;%
+  dplyr::select(-Id) %&gt;%
+  dplyr::filter(!is.na(Class))
+
+# Convert factor columns (except Class) to numeric
+df_clean &lt;- df_clean %&gt;%
+  dplyr::mutate(across(where(is.factor) &amp; !matches("Class"),
+                ~ as.numeric(as.character(.))))</code></pre>
+    </section>
+
+    <section id="step5" class="card">
+      <h2>🧩 Step 5 — Handle Missing Data</h2>
+      <p>Choose to <em>drop</em> missing rows or <em>impute</em> them (mean for numeric, mode for categorical).</p>
+      <h3>(A) Remove missing rows</h3>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">df_no_na &lt;- df_clean %&gt;% tidyr::drop_na()</code></pre>
+
+      <h3>(B) Impute missing values</h3>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">impute_mean &lt;- function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x)
+impute_mode &lt;- function(x) {
+  ux &lt;- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+df_imputed &lt;- df_clean %&gt;%
+  dplyr::mutate(across(where(is.numeric), impute_mean)) %&gt;%
+  dplyr::mutate(across(where(is.character), ~ tidyr::replace_na(., impute_mode(.))))</code></pre>
+    </section>
+
+    <section id="step6" class="card">
+      <h2>⚖️ Step 6 — Normalization</h2>
+      <p>Scale numeric predictors so no single feature dominates due to magnitude.</p>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">numeric_cols &lt;- df_imputed %&gt;%
+  dplyr::select(where(is.numeric)) %&gt;%
+  names()
+
+df_scaled &lt;- df_imputed
+df_scaled[numeric_cols] &lt;- scale(df_imputed[numeric_cols])</code></pre>
+    </section>
+
+    <section id="step7" class="card">
+      <h2>📊 Step 7 — Exploratory Data Analysis (EDA)</h2>
+      <h3>Distribution of classes</h3>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">ggplot(df_scaled, aes(x = Class)) +
+  geom_bar() +
+  ggtitle("Distribution of Diagnosis Class")</code></pre>
+
+      <h3>Correlation heatmap</h3>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">cor_matrix &lt;- cor(df_scaled[numeric_cols], use = "pairwise.complete.obs")
+heatmap(cor_matrix, main = "Correlation Matrix")</code></pre>
+    </section>
+
+    <section id="step8" class="card">
+      <h2>📑 Step 8 — Statistical Testing</h2>
+      <p>Compare means of a key feature across classes (e.g., <code>Cell.size</code>).</p>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">t_test_res &lt;- t.test(Cell.size ~ Class, data = df_scaled)
+print(t_test_res)</code></pre>
+    </section>
+
+    <section id="step9" class="card">
+      <h2>🔀 Step 9 — Multivariate Analysis (PCA &amp; Clustering)</h2>
+      <h3>PCA</h3>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">pca_res &lt;- FactoMineR::PCA(df_scaled[numeric_cols], graph = FALSE)
+factoextra::fviz_pca_ind(pca_res, geom.ind = "point",
+                         col.ind = df_scaled$Class, addEllipses = TRUE)</code></pre>
+
+      <h3>K-means clustering</h3>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">set.seed(123)
+k &lt;- 2
+km_res &lt;- kmeans(df_scaled[numeric_cols], centers = k, nstart = 25)
+
+df_scaled$cluster &lt;- factor(km_res$cluster)
+
+factoextra::fviz_cluster(km_res, data = df_scaled[numeric_cols])</code></pre>
+    </section>
+
+    <section id="step10" class="card">
+      <h2>🤖 Step 10 — Model Building (Random Forest Classification)</h2>
+      <p>Train/test split, model fitting, and performance with a confusion matrix.</p>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">set.seed(123)
+trainIndex &lt;- caret::createDataPartition(df_scaled$Class, p = .8, list = FALSE)
+trainData &lt;- df_scaled[trainIndex, ]
+testData  &lt;- df_scaled[-trainIndex, ]
+
+rf_model &lt;- randomForest::randomForest(Class ~ ., data = trainData, importance = TRUE)
+predictions &lt;- predict(rf_model, testData)
+
+conf_mat &lt;- caret::confusionMatrix(predictions, testData$Class)
+print(conf_mat)</code></pre>
+    </section>
+
+    <section class="card">
+      <h2>✅ Summary</h2>
+      <p>This pipeline covers data loading &amp; cleaning, missing data handling, normalization &amp; EDA, statistical testing, multivariate analysis (PCA &amp; clustering), and classification with Random Forest — a tidy, end-to-end example for teaching.</p>
+    </section>
+
+    <footer>
+      © <span id="year"></span> • R Pipeline Handout • Built with ❤️
+    </footer>
+  </main>
+
+  <script>
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Add copy-to-clipboard for each code block
+    function attachCopy(btn){
+      btn.addEventListener('click', async () => {
+        const pre = btn.closest('pre');
+        const code = pre.querySelector('code');
+        const text = code.innerText;
+        try{
+          await navigator.clipboard.writeText(text);
+          btn.classList.add('ok');
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.classList.remove('ok'); btn.textContent = 'Copy'; }, 1200);
+        }catch(e){
+          // fallback
+          const ta = document.createElement('textarea');
+          ta.value = text; document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); document.body.removeChild(ta);
+          btn.classList.add('ok');
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.classList.remove('ok'); btn.textContent = 'Copy'; }, 1200);
+        }
+      });
+    }
+    document.querySelectorAll('.copy-btn').forEach(attachCopy);
+
+    // Expand All Code (toggle) -> simply ensure all <pre> are fully expanded (they are overflow:auto by default)
+    const btnExpand = document.getElementById('btnExpand');
+    let expanded = false;
+    btnExpand.addEventListener('click', () => {
+      expanded = !expanded;
+      document.querySelectorAll('pre').forEach(pre => {
+        pre.style.maxHeight = expanded ? 'none' : '';
+      });
+      btnExpand.textContent = expanded ? 'Collapse All Code' : 'Expand All Code';
+    });
+
+    // Copy all code blocks concatenated
+    document.getElementById('btnCopyAll').addEventListener('click', async () => {
+      const blocks = Array.from(document.querySelectorAll('pre code'));
+      const combined = blocks.map(b => b.innerText).join('\n\n');
+      try{
+        await navigator.clipboard.writeText(combined);
+        const btn = document.getElementById('btnCopyAll');
+        const old = btn.textContent;
+        btn.textContent = 'All Code Copied!';
+        setTimeout(() => btn.textContent = old, 1200);
+      }catch(e){ alert('Copy failed.'); }
+    });
+  </script>
+</body>
+</html>
