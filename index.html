@@ -16,6 +16,9 @@
   <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-r.min.js"></script>
 
   <style>
+    /* =====================
+       THEME (Dark & Light)
+       ===================== */
     :root{
       --bg: #0c1222;
       --panel: #111a33;
@@ -27,6 +30,18 @@
       --code-bg: #0a1120;
       --shadow: 0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.04);
     }
+    .light{
+      --bg: #f7fbff;
+      --panel: #ffffff;
+      --ink: #0f1b36;
+      --muted: #58709f;
+      --accent: #0ea5e9;
+      --accent-ink: #03202e;
+      --border: #d9e3f7;
+      --code-bg: #f3f6fb;
+      --shadow: 0 8px 18px rgba(16,42,92,.08);
+    }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -39,15 +54,25 @@
       color:var(--ink);
       line-height:1.6;
       letter-spacing: .2px;
+      transition: background .25s ease, color .25s ease;
+    }
+    body.light{
+      background:
+        radial-gradient(1200px 600px at -10% -10%, #eaf4ff 0%, transparent 50%),
+        radial-gradient(800px 400px at 110% 20%, #eaf7ff 0%, transparent 60%),
+        var(--bg);
     }
 
-    /* Layout */
     .wrap{ max-width: 980px; margin: 0 auto; padding: 28px 18px 64px; }
     header{
       position: sticky; top: 0; z-index: 50;
       backdrop-filter: saturate(140%) blur(8px);
       background: linear-gradient(180deg, rgba(12,18,34,.9), rgba(12,18,34,.6));
       border-bottom: 1px solid var(--border);
+      transition: background .25s ease;
+    }
+    body.light header{
+      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.85));
     }
     header .bar{
       display:flex; align-items:center; gap:14px; padding:14px 18px; max-width:980px; margin:0 auto;
@@ -61,7 +86,7 @@
       box-shadow: 0 0 0 3px rgba(125,211,252,.15), 0 0 30px rgba(125,211,252,.35);
     }
     .brand span{ font-size: 15px; color: var(--muted); font-weight: 600; }
-    .actions{ margin-left:auto; display:flex; gap:10px; }
+    .actions{ margin-left:auto; display:flex; gap:10px; flex-wrap: wrap; }
     .btn{
       appearance:none; border:1px solid var(--border); background: var(--panel); color: var(--ink);
       padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer;
@@ -78,6 +103,7 @@
     h2{ font-size: 26px; margin: 28px 0 14px; }
     h3{ font-size: 20px; margin: 22px 0 10px; color: var(--muted); }
     p, li{ color:#d8e3ff; }
+    body.light p, body.light li{ color:#1e2a4a; }
     .lead{
       color: var(--muted);
       font-size: 18px;
@@ -106,6 +132,11 @@
     }
     .toc a:hover{ outline: 2px solid #3aa4cf33; transform: translateY(-1px); }
 
+    .section-head{
+      display:flex; align-items:center; gap:10px; justify-content:space-between; flex-wrap:wrap;
+    }
+    .section-actions{ display:flex; gap:8px; }
+
     /* Code blocks */
     pre{
       position: relative; margin: 14px 0 18px;
@@ -118,19 +149,20 @@
     }
     pre code{
       font-size: 14px;
-      white-space: pre-wrap;      /* wrap long lines on mobile */
-      word-break: break-word;     /* avoid overflow for long tokens */
+      white-space: pre-wrap;
+      word-break: break-word;
       color: var(--ink);
     }
 
-    /* 🔧 Prism token fixes: remove unintended white backgrounds */
+    /* Prism token fixes */
     pre code span { background: transparent !important; }
-    .token.operator, .token.punctuation { color: #eaf0ff; background: transparent !important; }
+    .token.operator, .token.punctuation { color: var(--ink); background: transparent !important; }
     .token.keyword { color: #ff8caa; }
-    .token.function { color: #7dd3fc; }
-    .token.number { color: #f9ca24; }
-    .token.string { color: #b0f4a8; }
+    .token.function { color: #0ea5e9; }
+    .token.number { color: #eab308; }
+    .token.string { color: #22c55e; }
     .token.comment { color: #94a3c2; }
+    body.light .token.comment { color: #6b7fa8; }
 
     .codebar {
       position:absolute; top:6px; right:6px; display:flex; gap:6px;
@@ -144,22 +176,38 @@
     .copy-btn:hover{ background: rgba(255,255,255,.08); }
     .copy-btn.ok{ background: #2ecc71; border-color: #1fa95a; color: #08140e; }
 
-    /* Footer */
     footer{
       margin-top: 40px; padding: 24px 0; border-top: 1px solid var(--border);
       color: var(--muted); font-size: 14px; text-align:center;
     }
 
-    /* Links */
     a{ color:#8fe4ff; }
     a:hover{ color:#aaf0ff; }
+    body.light a{ color:#0ea5e9; }
+    body.light a:hover{ color:#0284c7; }
 
     .badge{
       display:inline-block; padding:4px 8px; border-radius: 999px;
       background: #0a2033; color:#a6e3ff; border:1px solid #0f3450; font-size:12px; font-weight:600;
     }
+    body.light .badge{ background:#e8f6ff; color:#0f3f59; border-color:#c9e8fb; }
 
-    /* Mobile tweaks */
+    /* PRINT STYLES */
+    @media print {
+      body, html{ background:white !important; color:black !important; }
+      header{ position: static; background:white !important; border:none; }
+      .bar, .wrap{ box-shadow: none !important; }
+      .btn, .actions{ display:none !important; }
+      .card{ border:1px solid #d1d5db; box-shadow:none; background:white; }
+      pre{ background:#f6f8fa; border:1px solid #e2e8f0; }
+      pre code{ color:#111827; }
+      .token.keyword, .token.function, .token.number, .token.string, .token.comment { color: inherit; }
+      a:after{ content:" (" attr(href) ")"; font-size: 90%; color:#555; }
+      @page { margin: 16mm; }
+      h1{ page-break-before: avoid; }
+      section{ page-break-inside: avoid; margin-bottom: 10mm; }
+    }
+
     @media (max-width: 480px){
       pre code{ font-size: 13px; }
       h1{ font-size: 28px; }
@@ -173,8 +221,10 @@
     <div class="bar">
       <div class="brand"><div class="dot"></div><strong>R Pipeline</strong> <span>BreastCancer (mlbench)</span></div>
       <div class="actions">
+        <button class="btn" id="btnTheme">Light mode</button>
         <button class="btn" id="btnExpand">Expand All Code</button>
         <button class="btn accent" id="btnCopyAll">Copy All Code</button>
+        <button class="btn" id="btnPrint">Print / Save PDF</button>
       </div>
     </div>
   </header>
@@ -186,7 +236,7 @@
     <div class="card">
       <h3>Table of Contents</h3>
       <div class="toc">
-        <a href="#step1">📦 Step 1 — Load Libraries</a>
+        <a href="#step1">📦 Step 1 — Install &amp; Load Libraries</a>
         <a href="#step2">📂 Step 2 — Load Data</a>
         <a href="#step3">🔎 Step 3 — Initial Exploration</a>
         <a href="#step4">🧹 Step 4 — Data Cleaning</a>
@@ -200,12 +250,23 @@
     </div>
 
     <section id="intro" class="card">
-      <p>This page is a clean, reusable handout you can give to students. Each step includes runnable R code blocks. Click the <strong>Copy</strong> button on any code box to copy it to your clipboard.</p>
+      <div class="section-head">
+        <p>This page is a clean, reusable handout you can give to students. Each step includes runnable R code blocks. Click the <strong>Copy</strong> button on any code box to copy it to your clipboard.</p>
+      </div>
     </section>
 
     <section id="step1" class="card">
-      <h2>📦 Step 1 — Load Required Libraries</h2>
-      <p>We load packages for data wrangling, visualization, multivariate analysis, clustering, and machine learning.</p>
+      <div class="section-head">
+        <h2>📦 Step 1 — Install &amp; Load Required Libraries</h2>
+        <div class="section-actions"><button class="btn copy-section">Copy Section</button></div>
+      </div>
+      <p>If you don’t already have the packages, run this installation block first:</p>
+      <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">install.packages(c(
+  "mlbench", "dplyr", "tidyr", "ggplot2", "FactoMineR",
+  "factoextra", "caret", "cluster", "purrr", "randomForest"
+))</code></pre>
+
+      <p>Then load them:</p>
       <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">library(mlbench)       # BreastCancer dataset
 library(dplyr)         # Data manipulation
 library(tidyr)         # Handling missing values
@@ -219,14 +280,20 @@ library(randomForest)  # Classification model</code></pre>
     </section>
 
     <section id="step2" class="card">
-      <h2>📂 Step 2 — Load Data</h2>
+      <div class="section-head">
+        <h2>📂 Step 2 — Load Data</h2>
+        <div class="section-actions"><button class="btn copy-section">Copy Section</button></div>
+      </div>
       <p>The dataset <code>BreastCancer</code> contains cytological features and the target variable <code>Class</code> (benign/malignant).</p>
       <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">data("BreastCancer")
 df &lt;- BreastCancer</code></pre>
     </section>
 
     <section id="step3" class="card">
-      <h2>🔎 Step 3 — Initial Exploration</h2>
+      <div class="section-head">
+        <h2>🔎 Step 3 — Initial Exploration</h2>
+        <div class="section-actions"><button class="btn copy-section">Copy Section</button></div>
+      </div>
       <p>Quickly understand structure, summary statistics, and a snapshot of the data.</p>
       <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">glimpse(df)
 summary(df)
@@ -234,7 +301,10 @@ head(df)</code></pre>
     </section>
 
     <section id="step4" class="card">
-      <h2>🧹 Step 4 — Data Cleaning</h2>
+      <div class="section-head">
+        <h2>🧹 Step 4 — Data Cleaning</h2>
+        <div class="section-actions"><button class="btn copy-section">Copy Section</button></div>
+      </div>
       <p>Drop the non-informative ID column and convert predictors to numeric as needed.</p>
       <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r"># Remove ID column and ensure Class is valid
 df_clean &lt;- df %&gt;%
@@ -248,7 +318,10 @@ df_clean &lt;- df_clean %&gt;%
     </section>
 
     <section id="step5" class="card">
-      <h2>🧩 Step 5 — Handle Missing Data</h2>
+      <div class="section-head">
+        <h2>🧩 Step 5 — Handle Missing Data</h2>
+        <div class="section-actions"><button class="btn copy-section">Copy Section</button></div>
+      </div>
       <p>Choose to <em>drop</em> missing rows or <em>impute</em> them (mean for numeric, mode for categorical).</p>
       <h3>(A) Remove missing rows</h3>
       <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">df_no_na &lt;- df_clean %&gt;% tidyr::drop_na()</code></pre>
@@ -266,7 +339,10 @@ df_imputed &lt;- df_clean %&gt;%
     </section>
 
     <section id="step6" class="card">
-      <h2>⚖️ Step 6 — Normalization</h2>
+      <div class="section-head">
+        <h2>⚖️ Step 6 — Normalization</h2>
+        <div class="section-actions"><button class="btn copy-section">Copy Section</button></div>
+      </div>
       <p>Scale numeric predictors so no single feature dominates due to magnitude.</p>
       <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">numeric_cols &lt;- df_imputed %&gt;%
   dplyr::select(where(is.numeric)) %&gt;%
@@ -277,7 +353,10 @@ df_scaled[numeric_cols] &lt;- scale(df_imputed[numeric_cols])</code></pre>
     </section>
 
     <section id="step7" class="card">
-      <h2>📊 Step 7 — Exploratory Data Analysis (EDA)</h2>
+      <div class="section-head">
+        <h2>📊 Step 7 — Exploratory Data Analysis (EDA)</h2>
+        <div class="section-actions"><button class="btn copy-section">Copy Section</button></div>
+      </div>
       <h3>Distribution of classes</h3>
       <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">ggplot(df_scaled, aes(x = Class)) +
   geom_bar() +
@@ -289,14 +368,20 @@ heatmap(cor_matrix, main = "Correlation Matrix")</code></pre>
     </section>
 
     <section id="step8" class="card">
-      <h2>📑 Step 8 — Statistical Testing</h2>
+      <div class="section-head">
+        <h2>📑 Step 8 — Statistical Testing</h2>
+        <div class="section-actions"><button class="btn copy-section">Copy Section</button></div>
+      </div>
       <p>Compare means of a key feature across classes (e.g., <code>Cell.size</code>).</p>
       <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">t_test_res &lt;- t.test(Cell.size ~ Class, data = df_scaled)
 print(t_test_res)</code></pre>
     </section>
 
     <section id="step9" class="card">
-      <h2>🔀 Step 9 — Multivariate Analysis (PCA &amp; Clustering)</h2>
+      <div class="section-head">
+        <h2>🔀 Step 9 — Multivariate Analysis (PCA &amp; Clustering)</h2>
+        <div class="section-actions"><button class="btn copy-section">Copy Section</button></div>
+      </div>
       <h3>PCA</h3>
       <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">pca_res &lt;- FactoMineR::PCA(df_scaled[numeric_cols], graph = FALSE)
 factoextra::fviz_pca_ind(pca_res, geom.ind = "point",
@@ -313,7 +398,10 @@ factoextra::fviz_cluster(km_res, data = df_scaled[numeric_cols])</code></pre>
     </section>
 
     <section id="step10" class="card">
-      <h2>🤖 Step 10 — Model Building (Random Forest Classification)</h2>
+      <div class="section-head">
+        <h2>🤖 Step 10 — Model Building (Random Forest Classification)</h2>
+        <div class="section-actions"><button class="btn copy-section">Copy Section</button></div>
+      </div>
       <p>Train/test split, model fitting, and performance with a confusion matrix.</p>
       <pre class="language-r"><div class="codebar"><button class="copy-btn">Copy</button></div><code class="language-r">set.seed(123)
 trainIndex &lt;- caret::createDataPartition(df_scaled$Class, p = .8, list = FALSE)
@@ -341,7 +429,25 @@ print(conf_mat)</code></pre>
     // Footer year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Add copy-to-clipboard for each code block
+    // THEME: persist in localStorage
+    const THEME_KEY = 'r-pipeline-theme';
+    const btnTheme = document.getElementById('btnTheme');
+    function applyTheme(t){
+      document.body.classList.toggle('light', t === 'light');
+      btnTheme.textContent = (t === 'light') ? 'Dark mode' : 'Light mode';
+      localStorage.setItem(THEME_KEY, t);
+    }
+    const stored = localStorage.getItem(THEME_KEY);
+    if(stored){ applyTheme(stored); }
+    btnTheme.addEventListener('click', () => {
+      const t = document.body.classList.contains('light') ? 'dark' : 'light';
+      applyTheme(t);
+    });
+
+    // Print
+    document.getElementById('btnPrint').addEventListener('click', () => window.print());
+
+    // Copy button per code block
     function attachCopy(btn){
       btn.addEventListener('click', async () => {
         const pre = btn.closest('pre');
@@ -353,7 +459,6 @@ print(conf_mat)</code></pre>
           btn.textContent = 'Copied!';
           setTimeout(() => { btn.classList.remove('ok'); btn.textContent = 'Copy'; }, 1200);
         }catch(e){
-          // fallback
           const ta = document.createElement('textarea');
           ta.value = text; document.body.appendChild(ta); ta.select();
           document.execCommand('copy'); document.body.removeChild(ta);
@@ -365,7 +470,22 @@ print(conf_mat)</code></pre>
     }
     document.querySelectorAll('.copy-btn').forEach(attachCopy);
 
-    // Expand All Code (toggle) -> simply ensure all <pre> are fully expanded (they are overflow:auto by default)
+    // Copy Section buttons (concatenate all <pre><code> in the section)
+    document.querySelectorAll('.copy-section').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const section = btn.closest('section');
+        const blocks = Array.from(section.querySelectorAll('pre code'));
+        const combined = blocks.map(b => b.innerText).join('\\n\\n');
+        try{
+          await navigator.clipboard.writeText(combined);
+          btn.textContent = 'Section Copied!';
+          btn.classList.add('ok');
+          setTimeout(() => { btn.textContent = 'Copy Section'; btn.classList.remove('ok'); }, 1200);
+        }catch(e){ alert('Copy failed.'); }
+      });
+    });
+
+    // Expand All Code (toggle)
     const btnExpand = document.getElementById('btnExpand');
     let expanded = false;
     btnExpand.addEventListener('click', () => {
